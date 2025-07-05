@@ -2,7 +2,6 @@
 session_start();
 require_once 'config.php';
 
-// Jika sudah login, redirect ke halaman yang sesuai
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['role'] == 'asisten') {
         header("Location: asisten/dashboard.php");
@@ -30,15 +29,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
 
-            // Verifikasi password
             if (password_verify($password, $user['password'])) {
-                // Password benar, simpan semua data penting ke session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['nama'] = $user['nama'];
                 $_SESSION['role'] = $user['role'];
 
-                // ====== INI BAGIAN YANG DIUBAH ======
-                // Logika untuk mengarahkan pengguna berdasarkan peran (role)
                 if ($user['role'] == 'asisten') {
                     header("Location: asisten/dashboard.php");
                     exit();
@@ -46,10 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     header("Location: mahasiswa/dashboard.php");
                     exit();
                 } else {
-                    // Fallback jika peran tidak dikenali
                     $message = "Peran pengguna tidak valid.";
                 }
-                // ====== AKHIR DARI BAGIAN YANG DIUBAH ======
 
             } else {
                 $message = "Password yang Anda masukkan salah.";
@@ -65,35 +58,105 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
     <style>
-        /* ... (CSS Anda tidak perlu diubah) ... */
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background-color: #fff; padding: 20px 40px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 320px; }
-        h2 { text-align: center; color: #333; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; color: #555; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .btn { background-color: #007bff; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
-        .btn:hover { background-color: #0056b3; }
-        .message { color: red; text-align: center; margin-bottom: 15px; }
-        .message.success { color: green; }
-        .register-link { text-align: center; margin-top: 15px; }
-        .register-link a { color: #28a745; text-decoration: none; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #B82132, #D2665A, #F6DED8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 320px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #B82132;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background-color: #B82132;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background-color: #a1172b;
+        }
+
+        .message {
+            color: red;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .message.success {
+            color: green;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .register-link a {
+            color: #D2665A;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h2>Login</h2>
-        <?php 
-            if (isset($_GET['status']) && $_GET['status'] == 'registered') {
-                echo '<p class="message success">Registrasi berhasil! Silakan login.</p>';
-            }
-            if (!empty($message)) {
-                echo '<p class="message">' . $message . '</p>';
-            }
+        <?php
+        if (isset($_GET['status']) && $_GET['status'] == 'registered') {
+            echo '<p class="message success">Registrasi berhasil! Silakan login.</p>';
+        }
+        if (!empty($message)) {
+            echo '<p class="message">' . $message . '</p>';
+        }
         ?>
         <form action="login.php" method="post">
             <div class="form-group">
@@ -106,9 +169,10 @@ $conn->close();
             </div>
             <button type="submit" class="btn">Login</button>
         </form>
-         <div class="register-link">
+        <div class="register-link">
             <p>Belum punya akun? <a href="register.php">Daftar di sini</a></p>
         </div>
     </div>
 </body>
+
 </html>
