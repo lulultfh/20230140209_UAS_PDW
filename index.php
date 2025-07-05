@@ -92,8 +92,12 @@ $isLoggedIn = isset($_SESSION['user']);
             <?php
             $praktikums = [
                 ['nama' => 'Praktikum Pemrograman Dasar', 'deskripsi' => 'Belajar logika dasar dan sintaksis pemrograman.'],
-                ['nama' => 'Praktikum Jaringan Komputer', 'deskripsi' => 'Mengenal topologi, konfigurasi IP, dan routing.'],
-                ['nama' => 'Praktikum Basis Data', 'deskripsi' => 'Pengenalan SQL dan manajemen database relasional.']
+                ['nama' => 'Praktikum Algoritma dan Struktur Data', 'deskripsi' => 'Belajar algoritma dasar dan struktur data pada sintaksis pemrograman.'],
+                ['nama' => 'Praktikum Dasar Jaringan', 'deskripsi' => 'Mengenal topologi, konfigurasi IP, dan routing.'],
+                ['nama' => 'Praktikum SRWE', 'deskripsi' => 'Mengenal konfigurasi switch, router, dan OSPF.'],
+                ['nama' => 'Praktikum Routing dan Keamanan Jaringan', 'deskripsi' => 'Mengenal NAT, PAT, dan routing.'],
+                ['nama' => 'Praktikum Pengembangan Aplikasi Basis Data', 'deskripsi' => 'Pengenalan SQL dan manajemen database relasional.'],
+                ['nama' => 'Praktikum Implementasi Basis Data', 'deskripsi' => 'Pengenalan SQL dan manajemen database relasional.']
             ];
 
             foreach ($praktikums as $prak):
