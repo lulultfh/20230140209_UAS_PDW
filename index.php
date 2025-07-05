@@ -11,8 +11,8 @@ $isLoggedIn = isset($_SESSION['user']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SIMPRAK</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
 
-    <!-- Load Tailwind + Config -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -28,29 +28,6 @@ $isLoggedIn = isset($_SESSION['user']);
             }
         }
     </script>
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
-        .typing::after {
-            content: '|';
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0;
-            }
-        }
-    </style>
 </head>
 
 <body class="bg-light">
@@ -114,39 +91,7 @@ $isLoggedIn = isset($_SESSION['user']);
         </div>
     </section>
 
-    <!-- Typing Animation Script -->
-    <script>
-        const phrases = ["SIMPRAK", "Sistem Informasi Manajemen Praktikum"];
-        const el = document.getElementById("typed-text");
-        let phraseIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-
-        function type() {
-            const currentPhrase = phrases[phraseIndex];
-
-            if (isDeleting) {
-                el.textContent = currentPhrase.substring(0, charIndex--);
-                if (charIndex < 0) {
-                    isDeleting = false;
-                    phraseIndex = (phraseIndex + 1) % phrases.length;
-                    setTimeout(type, 300);
-                } else {
-                    setTimeout(type, 50);
-                }
-            } else {
-                el.textContent = currentPhrase.substring(0, charIndex++);
-                if (charIndex > currentPhrase.length) {
-                    isDeleting = true;
-                    setTimeout(type, 1000);
-                } else {
-                    setTimeout(type, 100);
-                }
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", type);
-    </script>
+    <script src="assets/js/typing.js"></script>
 
 </body>
 
