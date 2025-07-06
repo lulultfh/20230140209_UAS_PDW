@@ -112,17 +112,20 @@ $laporans = mysqli_query($conn, $query);
           </tr>
         </thead>
         <tbody>
-          <?php $i = 1; foreach ($laporans as $lap): ?>
+          <?php $i = 1;
+          foreach ($laporans as $lap): ?>
             <tr class="border-b hover:bg-lightblue/30">
               <td class="px-4 py-2"><?= $i++ ?></td>
               <td class="px-4 py-2"><?= htmlspecialchars($lap['nama_mahasiswa']) ?></td>
               <td class="px-4 py-2"><?= htmlspecialchars($lap['nama_praktikum']) ?></td>
               <td class="px-4 py-2">
-                <a href="uploads/<?= $lap['file'] ?>" class="text-blue-600 hover:underline" target="_blank">Lihat</a>
+                <a href="../../laporan_mahasiswa/<?= $lap['file_laporan'] ?>" class="text-blue-600 hover:underline"
+                  target="_blank">Lihat</a>
               </td>
               <td class="px-4 py-2"><?= htmlspecialchars($lap['status']) ?></td>
               <td class="px-4 py-2">
-                <a href="nilai_laporan.php?id=<?= $lap['id'] ?>" class="bg-lightblue text-darkblue px-3 py-1 rounded hover:bg-midblue hover:text-white">Nilai</a>
+                <a href="nilai_laporan.php?id=<?= $lap['id'] ?>"
+                  class="bg-lightblue text-darkblue px-3 py-1 rounded hover:bg-midblue hover:text-white">Nilai</a>
               </td>
             </tr>
           <?php endforeach; ?>

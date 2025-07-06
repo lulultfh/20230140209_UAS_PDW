@@ -1,10 +1,18 @@
 <?php
 session_start();
-$isLoggedIn = isset($_SESSION['user']);
+require_once 'config.php';
+
+// Cek apakah user sudah login dan apakah dia mahasiswa
+$isLoggedIn = isset($_SESSION['user_id']);
+$isMahasiswa = isset($_SESSION['role']) && $_SESSION['role'] === 'mahasiswa';
+
+// Ambil data praktikum dari database
+$query = "SELECT id, namaPrak, deskripsi FROM praktikum ORDER BY id DESC";
+$result = mysqli_query($conn, $query);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8" />
@@ -30,7 +38,7 @@ $isLoggedIn = isset($_SESSION['user']);
     </script>
 </head>
 
-<body class="bg-light">
+<body class="bg-light font-inter">
 
     <!-- Navbar -->
     <header class="bg-white shadow">
@@ -39,7 +47,7 @@ $isLoggedIn = isset($_SESSION['user']);
                 <a href="" class="text-xl font-bold text-primary">SIMPRAK</a>
                 <nav class="hidden md:flex items-center space-x-4">
                     <?php if ($isLoggedIn): ?>
-                        <a href="dashboard.php" class="text-sm text-primary hover:underline">Dashboard</a>
+                        <a href="mahasiswa/dashboard.php" class="text-sm text-primary hover:underline">Dashboard</a>
                         <a href="logout.php" class="text-sm text-red-600 hover:underline">Logout</a>
                     <?php else: ?>
                         <a href="login.php" class="bg-primary text-white px-4 py-2 rounded text-sm">Login</a>
@@ -57,42 +65,39 @@ $isLoggedIn = isset($_SESSION['user']);
             <span id="typed-text" class="typing"></span>
         </h1>
         <p class="max-w-xl mx-auto font-medium">
-            SIMPRAK (Sistem Informasi Manajemen Praktikum) adalah platform untuk mempermudah pengelolaan praktikum di
-            kampus Anda.
+            SIMPRAK (Sistem Informasi Manajemen Praktikum) adalah platform untuk mempermudah pengelolaan praktikum di kampus Anda.
         </p>
     </section>
 
-    <!-- Katalog -->
+    <!-- Katalog Praktikum -->
     <section class="py-12 px-6 max-w-screen-xl mx-auto">
         <h2 class="text-2xl font-semibold mb-6 text-primary">Katalog Praktikum</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <?php
-            $praktikums = [
-                ['nama' => 'Praktikum Pemrograman Dasar', 'deskripsi' => 'Belajar logika dasar dan sintaksis pemrograman.'],
-                ['nama' => 'Praktikum Algoritma dan Struktur Data', 'deskripsi' => 'Belajar algoritma dasar dan struktur data pada sintaksis pemrograman.'],
-                ['nama' => 'Praktikum Dasar Jaringan', 'deskripsi' => 'Mengenal topologi, konfigurasi IP, dan routing.'],
-                ['nama' => 'Praktikum SRWE', 'deskripsi' => 'Mengenal konfigurasi switch, router, dan OSPF.'],
-                ['nama' => 'Praktikum Routing dan Keamanan Jaringan', 'deskripsi' => 'Mengenal NAT, PAT, dan routing.'],
-                ['nama' => 'Praktikum Pengembangan Aplikasi Basis Data', 'deskripsi' => 'Pengenalan SQL dan manajemen database relasional.'],
-                ['nama' => 'Praktikum Implementasi Basis Data', 'deskripsi' => 'Pengenalan SQL dan manajemen database relasional.']
-            ];
 
-            foreach ($praktikums as $prak):
-                ?>
+            <?php while ($prak = mysqli_fetch_assoc($result)): ?>
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold text-primary mb-2"><?= $prak['nama'] ?></h3>
-                    <p class="text-secondary mb-4"><?= $prak['deskripsi'] ?></p>
-                    <a href="<?= $isLoggedIn ? 'detail_praktikum.php?judul=' . urlencode($prak['nama']) : 'login.php' ?>"
-                        class="inline-block bg-primary text-white px-4 py-2 rounded text-sm hover:bg-secondary transition">
-                        <?= $isLoggedIn ? 'Lihat Detail' : 'Daftar Praktikum' ?>
-                    </a>
+                    <h3 class="text-lg font-bold text-primary mb-2"><?= htmlspecialchars($prak['namaPrak']) ?></h3>
+                    <p class="text-secondary mb-4">
+                        <?= $prak['deskripsi'] ? htmlspecialchars($prak['deskripsi']) : 'Deskripsi belum tersedia.' ?>
+                    </p>
+
+                    <?php if ($isLoggedIn && $isMahasiswa): ?>
+                        <a href="mahasiswa/praktikum/daftar_praktikum.php?id=<?= $prak['id'] ?>"
+                           class="inline-block bg-primary text-white px-4 py-2 rounded text-sm hover:bg-secondary transition">
+                           Daftar Praktikum
+                        </a>
+                    <?php else: ?>
+                        <a href="login.php"
+                           class="inline-block bg-primary text-white px-4 py-2 rounded text-sm hover:bg-secondary transition">
+                           Login untuk Mendaftar
+                        </a>
+                    <?php endif; ?>
                 </div>
-            <?php endforeach; ?>
+            <?php endwhile; ?>
+
         </div>
     </section>
 
     <script src="assets/js/typing.js"></script>
-
 </body>
-
 </html>

@@ -1,100 +1,70 @@
 <?php
-$pageTitle = 'Penilaian Laporan';
-$activePage = 'laporan';
-require_once __DIR__ . '/../templates/header.php';
-require_once __DIR__ . '/../../config.php';
+session_start();
+require_once '../../config.php';
 
-$id = $_GET['id'] ?? 0;
-$laporan = mysqli_query($conn, "
-    SELECT laporan.*, modul.judul AS judul_modul, praktikum.namaPrak, users.nama AS nama_mahasiswa
-    FROM laporan
-    JOIN modul ON laporan.modul_id = modul.id
-    JOIN praktikum ON modul.praktikum_id = praktikum.id
-    JOIN users ON laporan.mahasiswa_id = users.id
-    WHERE laporan.id = $id
-");
-
-$data = mysqli_fetch_assoc($laporan);
-if (!$data) {
-    echo "<p class='text-red-500 text-center mt-10'>Data laporan tidak ditemukan.</p>";
-    exit;
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'asisten') {
+    header("Location: ../login.php");
+    exit();
 }
 
+// Tangani POST lebih awal sebelum ada output
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = intval($_POST['id']);
     $nilai = $_POST['nilai'];
     $feedback = $_POST['feedback'];
 
-    mysqli_query($conn, "
-        UPDATE laporan
-        SET nilai = '$nilai', feedback = '$feedback', status = 'Sudah Dinilai'
-        WHERE id = $id
-    ");
+    $update = mysqli_prepare($conn, "UPDATE laporan SET nilai = ?, feedback = ?, status = 'Sudah Dinilai' WHERE id = ?");
+    mysqli_stmt_bind_param($update, "ssi", $nilai, $feedback, $id);
+    mysqli_stmt_execute($update);
 
-    header('Location: laporan_masuk.php');
-    exit;
+    // Redirect balik ke laporan_masuk (pastikan tidak ada output sebelum ini!)
+    header("Location: laporan_masuk.php");
+    exit();
 }
+
+// Ambil data laporan
+$laporan_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+$query = mysqli_prepare($conn, "SELECT laporan.*, users.nama AS nama_mahasiswa, modul.judul AS judul_modul 
+                                FROM laporan 
+                                JOIN users ON laporan.mahasiswa_id = users.id 
+                                JOIN modul ON laporan.modul_id = modul.id 
+                                WHERE laporan.id = ?");
+mysqli_stmt_bind_param($query, "i", $laporan_id);
+mysqli_stmt_execute($query);
+$result = mysqli_stmt_get_result($query);
+$laporan = mysqli_fetch_assoc($result);
+
+if (!$laporan) {
+    die("Laporan tidak ditemukan.");
+}
+
+$pageTitle = 'Nilai Laporan';
+$activePage = 'laporan';
+require_once '../templates/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
+<div class="max-w-2xl mx-auto my-10 bg-white shadow-md rounded px-8 py-6">
+    <h2 class="text-xl font-bold text-darkblue mb-4">Form Penilaian</h2>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= $pageTitle ?></title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            inter: ['Inter', 'sans-serif']
-          },
-          colors: {
-            darkblue: '#213448',
-            midblue: '#547792',
-            lightblue: '#94B4C1',
-            soft: '#ECEFCA',
-          }
-        }
-      }
-    }
-  </script>
-</head>
+    <p class="mb-2"><strong>Mahasiswa:</strong> <?= htmlspecialchars($laporan['nama_mahasiswa']) ?></p>
+    <p class="mb-2"><strong>Modul:</strong> <?= htmlspecialchars($laporan['judul_modul']) ?></p>
+    <p class="mb-4">
+        <strong>File Laporan:</strong> 
+        <a href="uploads/<?= htmlspecialchars($laporan['file_laporan']) ?>" target="_blank" class="text-blue-600 underline">Lihat Laporan</a>
+    </p>
 
-<body class="bg-soft font-inter">
-  <div class="max-w-3xl mx-auto my-12 bg-white rounded-xl shadow-md p-8">
-    <h1 class="text-2xl font-bold text-darkblue mb-6">Penilaian Laporan</h1>
+    <form method="POST">
+        <input type="hidden" name="id" value="<?= $laporan['id'] ?>">
 
-    <div class="mb-6 space-y-2">
-      <p><span class="font-semibold text-darkblue">Mahasiswa:</span> <?= htmlspecialchars($data['nama_mahasiswa']) ?></p>
-      <p><span class="font-semibold text-darkblue">Praktikum:</span> <?= htmlspecialchars($data['namaPrak']) ?></p>
-      <p><span class="font-semibold text-darkblue">Modul:</span> <?= htmlspecialchars($data['judul_modul']) ?></p>
-      <p><span class="font-semibold text-darkblue">File:</span> <a href="uploads/<?= $data['file'] ?>" target="_blank" class="text-blue-600 hover:underline">Lihat File</a></p>
-    </div>
+        <label class="block mb-2 font-medium">Nilai:</label>
+        <input type="number" name="nilai" value="<?= htmlspecialchars($laporan['nilai']) ?>" class="w-full border border-gray-300 px-4 py-2 rounded mb-4" required>
 
-    <form method="POST" class="space-y-4">
-      <div>
-        <label class="block mb-1 font-medium text-darkblue">Nilai (0 - 100):</label>
-        <input type="number" name="nilai" min="0" max="100" required value="<?= htmlspecialchars($data['nilai'] ?? '') ?>"
-          class="w-full px-4 py-2 border rounded bg-soft text-darkblue">
-      </div>
+        <label class="block mb-2 font-medium">Feedback:</label>
+        <textarea name="feedback" rows="4" class="w-full border border-gray-300 px-4 py-2 rounded mb-4"><?= htmlspecialchars($laporan['feedback']) ?></textarea>
 
-      <div>
-        <label class="block mb-1 font-medium text-darkblue">Feedback:</label>
-        <textarea name="feedback" rows="4" class="w-full px-4 py-2 border rounded bg-soft text-darkblue" required><?= htmlspecialchars($data['feedback'] ?? '') ?></textarea>
-      </div>
-
-      <div class="text-right">
-        <button type="submit" class="bg-darkblue hover:bg-midblue text-white px-4 py-2 rounded">Simpan Penilaian</button>
-      </div>
+        <button type="submit" class="bg-darkblue text-white px-6 py-2 rounded hover:bg-midblue">Simpan Penilaian</button>
     </form>
-  </div>
-</body>
+</div>
 
-</html>
-<?php
-// 3. Panggil Footer
-require_once '../templates/footer.php';
-?>
+<?php require_once '../templates/footer.php'; ?>
