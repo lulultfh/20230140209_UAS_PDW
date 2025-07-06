@@ -73,3 +73,7 @@ $users = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
 </body>
 
 </html>
+<?php
+// 3. Panggil Footer
+require_once '../templates/footer.php';
+?>

@@ -94,3 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
+<?php
+// 3. Panggil Footer
+require_once '../templates/footer.php';
+?>

@@ -84,3 +84,7 @@ $moduls = mysqli_query($conn, "
 </body>
 
 </html>
+<?php
+// 3. Panggil Footer
+require_once '../templates/footer.php';
+?>
