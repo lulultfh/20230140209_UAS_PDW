@@ -36,7 +36,7 @@ $isLoggedIn = isset($_SESSION['user']);
     <header class="bg-white shadow">
         <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
             <div class="flex h-16 items-center justify-between">
-                <a href="#" class="text-xl font-bold text-primary">SIMPRAK</a>
+                <a href="" class="text-xl font-bold text-primary">SIMPRAK</a>
                 <nav class="hidden md:flex items-center space-x-4">
                     <?php if ($isLoggedIn): ?>
                         <a href="dashboard.php" class="text-sm text-primary hover:underline">Dashboard</a>
@@ -84,7 +84,7 @@ $isLoggedIn = isset($_SESSION['user']);
                     <p class="text-secondary mb-4"><?= $prak['deskripsi'] ?></p>
                     <a href="<?= $isLoggedIn ? 'detail_praktikum.php?judul=' . urlencode($prak['nama']) : 'login.php' ?>"
                         class="inline-block bg-primary text-white px-4 py-2 rounded text-sm hover:bg-secondary transition">
-                        <?= $isLoggedIn ? 'Lihat Detail' : 'Login untuk Akses' ?>
+                        <?= $isLoggedIn ? 'Lihat Detail' : 'Daftar Praktikum' ?>
                     </a>
                 </div>
             <?php endforeach; ?>
